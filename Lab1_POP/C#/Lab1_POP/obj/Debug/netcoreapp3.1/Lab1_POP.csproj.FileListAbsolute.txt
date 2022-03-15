@@ -1,0 +1,13 @@
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.exe
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.deps.json
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.runtimeconfig.json
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.runtimeconfig.dev.json
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.dll
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\bin\Debug\netcoreapp3.1\Lab1_POP.pdb
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.csprojAssemblyReference.cache
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.AssemblyInfoInputs.cache
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.AssemblyInfo.cs
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.csproj.CoreCompileInputs.cache
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.dll
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.pdb
+C:\Users\user\source\repos\Lab1_POP\Lab1_POP\obj\Debug\netcoreapp3.1\Lab1_POP.genruntimeconfig.cache
