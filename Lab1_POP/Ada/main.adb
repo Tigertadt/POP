@@ -26,7 +26,7 @@ procedure Main is
       end loop;
       delay 1.0;
 
-      Ada.Text_IO.Put_Line(sum'Img);
+      Ada.Text_IO.Put_Line(sum'Img%terms'Img);
 
 
    end main_thread;
