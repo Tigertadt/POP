@@ -1,10 +1,14 @@
 package com.company;
+import java.time.*;
 
 public class ArrClass {
     private final int dim;
     private final int threadNum;
     public final int[] arr;
     public int index_res;
+    private int min = Integer.MAX_VALUE;
+    private int minIdx = -1;
+
 
     public ArrClass(int dim, int threadNum) {
         this.dim = dim;
@@ -29,7 +33,6 @@ public class ArrClass {
         return min;
     }
 
-    private long min = 0;
 
     synchronized public long getMin() {
         while (getThreadCount()<threadNum){
@@ -42,12 +45,6 @@ public class ArrClass {
         return min;
     }
 
-    synchronized public int collectMin(long min, int index){
-        this.min = min;
-        this.index_res  = index;
-        return index;
-    }
-
     private int threadCount = 0;
     synchronized public void incThreadCount(){
         threadCount++;
@@ -58,24 +55,37 @@ public class ArrClass {
         return threadCount;
     }
 
-    public long ParallelMin(){
-        ThreadMin[] threadMins = new ThreadMin[threadNum];
+    private void ParallelMin(int[] arr,int threadNum)
+    {
 
-        int n = arr.length / threadNum;
-        int[] arr1 = new int[n];
-        for(int j = 0; j<n;j++)
-        {
-            arr1[j] = arr[j];
+       ThreadMin[] threads  = new ThreadMin[threadNum];
+        minIdx = -1;
 
-            for (int i = 0; i < threadNum; i++)
+            Object _lock = new Object();
+
+            for (int thread1 = 0; thread1 < threadNum; thread1++)
             {
-                threadMins[i] = new ThreadMin(arr1[0], arr1[arr1.length-1], this);
-                threadMins[i].start();
+                var threadId = thread1;
+                threads[thread1] = new Thread(() ->
+                {
+                for (int i = arr.length * threadId / threadNum; i < arr.length * (threadId + 1) / threadNum; i++)
+                {
+                    if (arr[i] < min)
+                    {
+                        synchronized (_lock)
+                        {
+                            if (arr[i] < min)
+                            {
+                                min = arr[i];
+                                minIdx = i;
+                            }
+                        }
+                    }
+
             }
-        }
+            });
+                threads[threadId].run();
+            }
 
-
-
-        return getMin();
     }
 }

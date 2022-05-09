@@ -11,7 +11,7 @@ public class Main {
         ArrClass arrClass = new ArrClass(dim, threadNum);
 
 
-        System.out.println("Найменше число масиву: \n"+ arrClass.ParallelMin()+ " його індекс:  "+ arrClass.collectMin(min,index));
+        System.out.println("Найменше число масиву: \n"+ min+ " його індекс:  "+ index);
 
 
     }
