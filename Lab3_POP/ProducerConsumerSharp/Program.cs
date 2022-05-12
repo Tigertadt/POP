@@ -29,15 +29,17 @@ namespace ProducerConsumerSharp
                 threadProducer.Start(itemNumbers/producers);
             }
 
-           
 
+            (new Thread(Producer)).Start(itemNumber - itemNumber / producers * (producers - 1));
 
             for (int i = 0; i < consumers - 1; i++)
             {
                 Thread threadConsumer = new Thread(Consumer);
                 threadConsumer.Start(itemNumbers/consumers);
             }
-          
+
+             (new Thread(Consumer)).Start(itemNumber - itemNumber / consumers * (consumers - 1));
+
         }
 
         private Semaphore Access;
