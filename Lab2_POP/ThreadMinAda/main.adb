@@ -15,15 +15,14 @@ procedure Main is
       arr(3) := -12;
    end Init_Arr;
 
-   function part_min(start_index, finish_index : in integer) return long_long_integer is
-      min : long_long_integer := 0;
+   procedure part_min(start_index, finish_index: Integer; min_value, min_index : in out Integer) is
    begin
-      for i in start_index..finish_index-1 loop
-         if long_long_integer(arr(i)) < min then
-             min := long_long_integer(arr(i));
+      for i in start_index..finish_index loop
+         if arr(i) < min_value then
+            min_value := arr(i);
+            min_index := i;
          end if;
       end loop;
-      return min;
    end part_min;
 
    task type starter_thread is
@@ -31,56 +30,64 @@ procedure Main is
    end starter_thread;
 
    protected part_manager is
-      procedure set_part_min(min : in Long_Long_Integer);
-      entry get_min(min : out Long_Long_Integer);
+      procedure set_part_min(min_value, min_index: Integer);
+      entry get_min(min_value, min_index: out Integer);
    private
-      tasks_count : Integer := 0;
-      min1 : Long_Long_Integer:=0;
+       global_min_value : Integer := Integer'Last;
+      global_min_index: Integer := 0;
    end part_manager;
 
    protected body part_manager is
-      procedure set_part_min(min : in Long_Long_Integer) is
+      procedure set_part_min(min_value, min_index: Integer) is
       begin
-         min1 := Long_Long_Integer'Min(min1, min);
-         tasks_count := tasks_count + 1;
+         if min_value < global_min_value then
+            global_min_value := min_value;
+            global_min_index := min_index;
+         end if;
       end set_part_min;
 
-      entry get_min(min : out Long_Long_Integer) when tasks_count = thread_num is
+      entry get_min(min_value, min_index: out Integer) when True is
       begin
-         min := min1;
+         min_value := global_min_value;
+         min_index := global_min_index;
       end get_min;
 
    end part_manager;
 
    task body starter_thread is
-      min : Long_Long_Integer := 0;
-      start_index, finish_index : Integer;
+      min_value: Integer := Integer'Last;
+      min_index: Integer := 0;
    begin
-      accept start(start_index, finish_index : in Integer) do
-         starter_thread.start_index := start_index;
-         starter_thread.finish_index := finish_index;
+      accept start(start_index, finish_index: Integer) do
+         part_min(start_index => start_index, finish_index => finish_index,
+                  min_value => min_value, min_index => min_index);
+         min_store.set_min(min_value, min_index);
       end start;
       min := part_min(start_index  => start_index,
                       finish_index => finish_index);
       part_manager.set_part_min(min);
    end starter_thread;
 
-   function parallel_min return Long_Long_Integer is
-      min : long_long_integer := 0;
-      thread : array(1..thread_num) of starter_thread;
+   procedure parallel_min(threads_num: Integer) is
+      min_value: Integer := Integer'Last;
+      min_index: Integer := 0;
+      part_len: Integer := arr_len / threads_num;
+      threads: array(0..threads_num-1) of min_thread;
    begin
-
-      for i in 1..thread_num loop
-         thread(i).start(1 + (i - 1) * dim / thread_num, 1 + i * dim / thread_num);
+      for i in 0..threads_num-2 loop
+         threads(i).start(i*part_len, (i+1)*part_len-1);
       end loop;
-
-      part_manager.get_min(min);
-      return min;
+      threads(threads_num-1).start((threads_num-1)*part_len, arr_len-1);
+      min_store.get_min(min_value, min_index);
+      Put_Line("Paralel min: arr(" & min_index'img &") = " & min_value'Img);
    end parallel_min;
 
 begin
+   Put_Line("number of threads:");
+   thread_nums := Integer'Value(Get_Line);
    Init_Arr;
-   Put_Line(part_min(1, dim)'img);
-   Put_Line(parallel_min'img);
+   part_min(0, arr_len-1, check_min_value, check_min_index);
+   Put_Line("One thread min: arr("& check_min_index'img &") = " & check_min_value'Img);
+   parallel_min(thread_nums);
 
 end Main;
