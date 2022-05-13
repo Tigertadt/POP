@@ -22,7 +22,7 @@ public class Consumer implements Runnable {
 
                 item = manager.storage.get(0);
                 manager.storage.remove(0);
-                System.out.println("Consumer " + Thread.currentThread().getId() + " took " + item);
+                System.out.println("Consumer took " + item);
 
                 manager.access.release();
                 manager.full.release();

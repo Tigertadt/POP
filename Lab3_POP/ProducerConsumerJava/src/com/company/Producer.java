@@ -21,7 +21,7 @@ public class Producer implements Runnable{
                 manager.access.acquire();
 
                 manager.storage.add("item " + i);
-                System.out.println("Producer " + Thread.currentThread().getId() + " added item " + i);
+                System.out.println("Producer added item " + i);
 
                 manager.access.release();
                 manager.empty.release();

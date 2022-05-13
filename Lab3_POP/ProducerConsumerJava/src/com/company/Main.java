@@ -6,9 +6,7 @@ public class Main {
         Main main = new Main();
         int storageSize = 3;
         int itemNumbers = 10;
-        int producers = 2;
-        int consumers = 5;
-        main.starter(storageSize, itemNumbers,producers,consumers);
+        main.starter(storageSize, itemNumbers,3,5);
     }
 
     private void starter(int storageSize, int itemNumbers,int producers,int consumers) {
