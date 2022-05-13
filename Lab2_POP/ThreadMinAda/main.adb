@@ -1,7 +1,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 procedure Main is
 
-   dim : constant integer := 100000000;
+   dim : constant integer := 1000;
    thread_num : constant integer := 5;
 
    arr : array(1..dim) of integer;
@@ -13,84 +13,99 @@ procedure Main is
       end loop;
 
 
-      arr(3) := -12;
    end Init_Arr;
-    min_value : long_long_integer := 0;
-    min_index : long_long_integer := 0;
 
-
-   procedure part_min(start_index, finish_index: Integer; min_value, min_index : in out Integer) is
+   function part_min(start_index, finish_index : in integer) return long_long_integer is
+      min : long_long_integer := 0;
    begin
-      for i in start_index..finish_index loop
-         if arr(i) < min_value then
-            min_value := arr(i);
-            min_index := i;
+      for i in start_index..finish_index-1 loop
+         if long_long_integer(arr(i)) < min then
+            min := long_long_integer(arr(i));
          end if;
       end loop;
+      return min;
    end part_min;
+
+   function part_min_index(start_index, finish_index : in integer) return long_long_integer is
+      min : long_long_integer := 0;
+      min_index: Long_Long_Integer := 0;
+   begin
+      for i in start_index..finish_index-1 loop
+         if long_long_integer(arr(i)) < min then
+            min := long_long_integer(arr(i));
+            min_index := Long_Long_Integer(i);
+         end if;
+      end loop;
+      return min_index;
+   end part_min_index;
+
 
    task type starter_thread is
       entry start(start_index, finish_index : in Integer);
    end starter_thread;
 
    protected part_manager is
-      procedure set_part_min(min_value, min_index: Integer);
-      entry get_min(min_value, min_index: out Integer);
+      procedure set_part_min(min, min_index : in Long_Long_Integer);
+      entry get_min(min, min_index : out Long_Long_Integer);
    private
-       global_min_value : Integer := Integer'Last;
-      global_min_index: Integer := 0;
+      tasks_count : Integer := 0;
+      min1 : Long_Long_Integer:=0;
+      min_index1 : Long_Long_Integer:=0;
    end part_manager;
 
    protected body part_manager is
-      procedure set_part_min(min_value, min_index: Integer) is
+      procedure set_part_min(min,min_index : in Long_Long_Integer) is
       begin
-         if min_value < global_min_value then
-            global_min_value := min_value;
-            global_min_index := min_index;
-         end if;
+          if long_long_integer(min) < min1 then
+            min1 := long_long_integer(min);
+             end if;
+         min_index1 := Long_Long_Integer(part_min_index(1,dim));
+         tasks_count := tasks_count + 1;
       end set_part_min;
 
-      entry get_min(min_value, min_index: out Integer)  when tasks_count = thread_num is
+      entry get_min(min,min_index: out Long_Long_Integer) when tasks_count = thread_num is
       begin
-         min_value := global_min_value;
-         min_index := global_min_index;
+         min := min1;
+         min_index := min_index1;
       end get_min;
 
    end part_manager;
 
    task body starter_thread is
-      min_value: Integer := Integer'Last;
-      min_index: Integer := 0;
+      min : Long_Long_Integer := 0;
+      min_index : Long_Long_Integer := 0;
+      start_index, finish_index : Integer;
    begin
       accept start(start_index, finish_index : in Integer) do
-                part_min(start_index => start_index, finish_index => finish_index,
-                  min_value => min_value, min_index => min_index);
-         min_store.set_min(min_value, min_index);
+         starter_thread.start_index := start_index;
+         starter_thread.finish_index := finish_index;
       end start;
       min := part_min(start_index  => start_index,
                       finish_index => finish_index);
-      part_manager.set_part_min(min);
+      min_index := part_min_index(start_index  => start_index,
+                      finish_index => finish_index);
+      part_manager.set_part_min(min, min_index);
    end starter_thread;
 
-   procedure parallel_min(threads_num: Integer) is
-      min_value: Integer := Integer'Last;
-      min_index: Integer := 0;
-      threads: array(0..threads_num-1) of min_thread;
+   procedure parallel_min(thread_num: Integer) is
+      min : long_long_integer := 0;
+      min_index : long_long_integer := 0;
+      thread : array(1..thread_num) of starter_thread;
    begin
+
       for i in 1..thread_num loop
          thread(i).start(1 + (i - 1) * dim / thread_num, 1 + i * dim / thread_num);
       end loop;
-      threads(threads_num-1).start((threads_num-1)*part_len, arr_len-1);
-      min_store.get_min(min_value, min_index);
-      Put_Line("Paralel min: arr(" & min_index'img &") = " & min_value'Img);
+
+      part_manager.get_min(min,min_index);
+      Put_Line("Paralel min: arr("&min_index'img &") = " & min'Img);
+
    end parallel_min;
 
 begin
-   Put_Line("number of threads:");
-   thread_nums := Integer'Value(Get_Line);
    Init_Arr;
-   part_min(0, arr_len-1, check_min_value, check_min_index);
-   Put_Line("One thread min: arr("& check_min_index'img &") = " & check_min_value'Img);
-   parallel_min(thread_nums);
+
+   Ada.Text_IO.Put_Line(part_min_index(1,dim)'img & part_min(1, dim)'img);
+    parallel_min(thread_num);
 
 end Main;
