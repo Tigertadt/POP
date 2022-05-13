@@ -1,11 +1,10 @@
-
 with Ada.Text_IO, GNAT.Semaphores;
 use Ada.Text_IO, GNAT.Semaphores;
 
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 use Ada.Containers;
 
-procedure Producer_Consumer is
+procedure Main is
    package String_Lists is new Indefinite_Doubly_Linked_Lists (String);
    use String_Lists;
 
@@ -16,22 +15,18 @@ procedure Producer_Consumer is
       Full_Storage   : Counting_Semaphore (Storage_Size, Default_Ceiling);
       Empty_Storage  : Counting_Semaphore (0, Default_Ceiling);
 
-      task Producer;
+      task type Producer(Item_Numbers : Integer);
 
-      task Consumer;
+      task type Consumer(Item_Numbers : Integer);
 
       task body Producer is
-       --  Item_Numbers : Integer;
       begin
-         --  accept Start (Item_Number : in Integer) do
-         --     Producer.Item_Numbers := Item_Number1;
-         --  end Start;
-         for i in 1 .. Item_Number1 loop
+         for i in 1 .. Item_Numbers loop
             Full_Storage.Seize;
             Access_Storage.Seize;
 
             Storage.Append ("item " & i'Img);
-            Put_Line ("Added item " & i'Img);
+            Put_Line ("Producer added item " & i'Img);
 
             Access_Storage.Release;
             Empty_Storage.Release;
@@ -41,22 +36,14 @@ procedure Producer_Consumer is
       end Producer;
 
       task body Consumer is
-        -- Item_Numbers : Integer;
       begin
-        --  accept Start (Item_Numbers : in Integer) do
-         --     Consumer.Item_Numbers := Item_Number1;
-         --  end Start;
-         for i in 1 .. Item_Number1 loop
+         for i in 1 .. Item_Numbers loop
             Empty_Storage.Seize;
             Access_Storage.Seize;
 
-            declare
-               item : String := First_Element (Storage);
-            begin
-               Put_Line ("Took " & item);
-            end;
-
             Storage.Delete_First;
+
+              Put_Line ("Consumer took " & i'Img);
 
             Access_Storage.Release;
             Full_Storage.Release;
@@ -66,18 +53,20 @@ procedure Producer_Consumer is
 
       end Consumer;
 
+
+
+     t1: Producer (Item_Numbers);
+     t2:  Producer (Item_Numbers);
+     t3: Producer (Item_Numbers);
+     t4: Consumer (Item_Numbers);
+     t5: Consumer (Item_Numbers);
+	  t6: Consumer (Item_Numbers);
+
    begin
       null;
-      --     Consumer.Start (Item_Number);
-      --     Consumer.Start (Item_Numbers);
-      --     Consumer.Start (Item_Numbers);
-      --     Producer.Start (Item_Numbers);
-      --     Producer.Start (Item_Numbers);
-      --     Producer.Start (Item_Numbers);
-
-  end Starter;
+   end Starter;
 
 begin
-   Starter (2, 15);
+   Starter (3, 41);
    null;
-end Producer_Consumer;
+end main;
