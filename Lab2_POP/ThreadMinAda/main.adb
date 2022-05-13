@@ -12,8 +12,12 @@ procedure Main is
          arr(i) := i;
       end loop;
 
+
       arr(3) := -12;
    end Init_Arr;
+    min_value : long_long_integer := 0;
+    min_index : long_long_integer := 0;
+
 
    procedure part_min(start_index, finish_index: Integer; min_value, min_index : in out Integer) is
    begin
@@ -46,7 +50,7 @@ procedure Main is
          end if;
       end set_part_min;
 
-      entry get_min(min_value, min_index: out Integer) when True is
+      entry get_min(min_value, min_index: out Integer)  when tasks_count = thread_num is
       begin
          min_value := global_min_value;
          min_index := global_min_index;
@@ -58,8 +62,8 @@ procedure Main is
       min_value: Integer := Integer'Last;
       min_index: Integer := 0;
    begin
-      accept start(start_index, finish_index: Integer) do
-         part_min(start_index => start_index, finish_index => finish_index,
+      accept start(start_index, finish_index : in Integer) do
+                part_min(start_index => start_index, finish_index => finish_index,
                   min_value => min_value, min_index => min_index);
          min_store.set_min(min_value, min_index);
       end start;
@@ -71,11 +75,10 @@ procedure Main is
    procedure parallel_min(threads_num: Integer) is
       min_value: Integer := Integer'Last;
       min_index: Integer := 0;
-      part_len: Integer := arr_len / threads_num;
       threads: array(0..threads_num-1) of min_thread;
    begin
-      for i in 0..threads_num-2 loop
-         threads(i).start(i*part_len, (i+1)*part_len-1);
+      for i in 1..thread_num loop
+         thread(i).start(1 + (i - 1) * dim / thread_num, 1 + i * dim / thread_num);
       end loop;
       threads(threads_num-1).start((threads_num-1)*part_len, arr_len-1);
       min_store.get_min(min_value, min_index);
